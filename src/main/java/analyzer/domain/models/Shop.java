@@ -1,4 +1,6 @@
-package analyzer.models;
+package analyzer.domain.models;
+
+import java.util.List;
 
 import javax.persistence.*;
 
@@ -7,6 +9,9 @@ import javax.persistence.*;
 public class Shop {
     @Column(name = "name")
     private String name;
+
+    @OneToMany(mappedBy = "shop")
+    private List<Base> bases;
 
     @Id
     @SequenceGenerator(name = "shop_seq", sequenceName = "shop_sequence", allocationSize = 1)

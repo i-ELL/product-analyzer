@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Filled Line Chart</title>
+    <!--Chart.js JS CDN-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+</head>
+<body>
+
+<canvas id="myChart" style="display: block; border-radius: 16px; border: 4px solid rgba(91, 91, 246, 0.897);" class="chartjs-render-monitor"></canvas>
+
+<script>
+    let url1 = "https://www.globus.ru/catalog/molochnye-produkty-syr-yaytsa/moloko-i-molochnye-produkty/moloko/?page=1";
+    let url2 = "https://www.globus.ru/catalog/molochnye-produkty-syr-yaytsa/moloko-i-molochnye-produkty/moloko/?page=2"
+    let request1 = fetch(url1);
+    let request2 = fetch(url2);
+    Promise.all([request1, request2])
+        .then(responses => {
+            return Promise.all(responses.map(response => response.text()));;
+        })
+        // Получаем текст HTML страницы
+        .then(html => {
+
+            let parser = new DOMParser();
+            let doc = parser.parseFromString(html, 'text/html');
+
+            let prices = Array.from(doc.querySelectorAll('.pim-list__item-price-actual-main')).map(p => p.innerText.trim());
+            let names = Array.from(doc.querySelectorAll('.pim-list__item-title.js-crop-text')).map(p => p.innerText.trim());
+
+            //pim-list__item-img
+            let names1 = [];
+            let prices1 = [];
+            prices.sort((a, b) => a - b);
+
+            for (let i = 0; i < names.length; i++){
+                if(names[i].includes("1 л")){
+                    names1.push(names[i]);
+                    prices1.push(prices[i]);
+                }
+            }
+
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: names1,
+                    datasets: [{
+                        data: prices1,
+                        label: "Молоко Глобус",
+                        borderColor: "rgb(62,149,205)",
+                        backgroundColor: "rgb(62,149,205,0.1)",
+                    }
+                    ]
+                },
+            });
+
+        })
+        .catch(error => {
+            alert('Ошибка получения данных. Возможно у Вас отстутсвует подключение к интернету.');
+        });
+</script>
+
+
+
+</body>
+</html>
